@@ -144,6 +144,7 @@ _nodes = {
     'FormattedValue': (('value', 'conversion', 'format_spec',),
                        ('lineno', 'col_offset',), (expr,)),
     'JoinedStr': (('values',), ('lineno', 'col_offset',), (expr,)),
+    'Constant': (('value',), ('lineno', 'col_offset',), (expr,)),
     'Bytes': (('s',), ('lineno', 'col_offset',),
               (expr,)),
     'NameConstant': (('value',), ('lineno', 'col_offset',),
@@ -256,11 +257,14 @@ def literal_eval(node_or_string):
 
 
 def get_docstring(node, clean=True):
+    import sys
     if not isinstance(node, (FunctionDef, ClassDef, Module)):
         raise TypeError("%r can't have docstrings" % node.__class__.__name__)
+    DocStringTy = Str if sys.version_info[:2] < (3, 8) else Constant
     if node.body and isinstance(node.body[0], Expr) and \
-       isinstance(node.body[0].value, Str):
+       isinstance(node.body[0].value, DocStringTy):
         if clean:
             import inspect
-            return inspect.cleandoc(node.body[0].value.s)
+            holder = node.body[0].value
+            return inspect.cleandoc(getattr(holder, holder._fields[0]))
         return node.body[0].value.s

@@ -40,8 +40,12 @@ def foo(x=1, *args, **kwargs):
         code = 'x + 1'
         tree = gast.parse(code, mode='eval')
         dump = gast.dump(tree)
-        norm = ("Expression(body=BinOp(left=Name(id='x', ctx=Load(), "
-                "annotation=None), op=Add(), right=Num(n=1)))")
+        if sys.version_info[:2] < (3, 8):
+            norm = ("Expression(body=BinOp(left=Name(id='x', ctx=Load(), "
+                    "annotation=None), op=Add(), right=Num(n=1)))")
+        else:
+            norm = ("Expression(body=BinOp(left=Name(id='x', ctx=Load(), "
+                    "annotation=None), op=Add(), right=Constant(value=1)))")
         self.assertEqual(dump, norm)
         self.assertEqual(len(list(gast.walk(tree))), 6)
 
