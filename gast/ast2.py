@@ -5,6 +5,14 @@ import gast
 
 class Ast2ToGAst(AstToGAst):
 
+    # mod
+    def visit_Module(self, node):
+        new_node = gast.Module(
+            self._visit(node.body),
+            []  # type_ignores
+        )
+        return new_node
+
     # stmt
     def visit_FunctionDef(self, node):
         new_node = gast.FunctionDef(
@@ -153,6 +161,11 @@ class Ast2ToGAst(AstToGAst):
 
 
 class GAstToAst2(GAstToAst):
+
+    # mod
+    def visit_Module(self, node):
+        new_node = ast.Module(self._visit(node.body))
+        return new_node
 
     # stmt
     def visit_FunctionDef(self, node):

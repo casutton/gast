@@ -6,6 +6,14 @@ import sys
 
 class Ast3ToGAst(AstToGAst):
 
+    if sys.version_info[:2] < (3, 8):
+        def visit_Module(self, node):
+            new_node = gast.Module(
+                self._visit(node.body),
+                []  # type_ignores
+            )
+            return new_node
+
     def visit_Name(self, node):
         new_node = gast.Name(
             self._visit(node.id),
@@ -68,6 +76,12 @@ class Ast3ToGAst(AstToGAst):
 
 
 class GAstToAst3(GAstToAst):
+
+    if sys.version_info[:2] < (3, 8):
+
+        def visit_Module(self, node):
+            new_node = ast.Module(self._visit(node.body))
+            return new_node
 
     def _make_arg(self, node):
         if node is None:

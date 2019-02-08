@@ -3,6 +3,12 @@ import ast as _ast
 from ast import boolop, cmpop, excepthandler, expr, expr_context, operator
 from ast import slice, stmt, unaryop, mod, AST
 
+try:
+    from ast import TypeIgnore
+except ImportError:
+    class TypeIgnore(AST):
+        pass
+
 
 def _make_node(Name, Fields, Attributes, Bases):
     def create_node(self, *args, **kwargs):
@@ -27,7 +33,7 @@ def _make_node(Name, Fields, Attributes, Bases):
 
 _nodes = {
     # mod
-    'Module': (('body',), (), (mod,)),
+    'Module': (('body', 'type_ignores'), (), (mod,)),
     'Interactive': (('body',), (), (mod,)),
     'Expression': (('body',), (), (mod,)),
     'Suite': (('body',), (), (mod,)),
@@ -225,6 +231,9 @@ _nodes = {
 
     # withitem
     'withitem': (('context_expr', 'optional_vars'), (), (AST,)),
+
+    # type_ignore
+    'type_ignore': ((), ('lineno',), (TypeIgnore,)),
 }
 
 for name, descr in _nodes.items():

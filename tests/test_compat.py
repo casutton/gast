@@ -74,6 +74,13 @@ class CompatTestCase(unittest.TestCase):
                 tree = gast.parse(code)
                 compile(gast.gast_to_ast(tree), '<test>', 'exec')
 
+        if sys.version_info.minor >= 8:
+
+            def test_TypeIgnore(self):
+                code = 'def foo(): pass  # type: ignore'
+                tree = gast.parse(code)
+                compile(gast.gast_to_ast(tree), '<test>', 'exec')
+
 
 if __name__ == '__main__':
     unittest.main()
